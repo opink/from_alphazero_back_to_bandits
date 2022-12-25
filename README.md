@@ -31,17 +31,27 @@
 
 ## 4. 总的来说，AlphaGo Zero分为两个部分，一部分是MCTS（蒙特卡洛树搜索），一部分是神经网络。
 
-### 4.1 原始的（ALphaGo的）
+### 4.1 从原始的（ALphaGo的）开始
 #### 4.1.1 MCTS部分
 1. 蒙特卡洛：fastrollout
-2. 树搜索UCT（UCB在树上的版本）：select-expand-backup
+2. MiniMax Tree Search树搜索：UCT（UCB在树上的版本），select-[optional:expand（对某节点访问次数做个阈值）]-backup
 
-合起来共四个步骤：select-expand-fastrollout-backupS
+合起来共四个步骤：select-expand-fastrollout-backup
 
 #### 4.1.2 神经网络部分
-1. 首先使用模仿学习先监督学出一个弱鸡人类策略网络P_0，
-2. 而后用P_0辅助fastrollout，
-3. 收集到一些对局轨迹之后，开始硬训练个更好的策略价值网络P，
+1. 首先使用模仿学习从人类状态行动对中先监督学出2个神经网络（一个简单的弱鸡fastrollout策略网络P_f，一个复杂一些的策略网路SL Policy Network用于初始化RL Policy Network 用来作为tree policy之后计算PUCT),
+2. 而后self-play，得到的对局结果用强化学习学习出2个神经网络RL Policy Network和 Value Network，
+3. select时使用PUCT（Tree Policy with SL Policy），fastrollout结果与Value Network结果加权作为backup，
+
+### 4.2 AlphaGo Zero
+1. 只有一个网络，输出p和v；让mcts作为策略网络学习的老师，
+2. self-play时使用MCTS得到的次数计算出一个概率分布π，根据π选择实际的行动，
+3. 没有rollout过程，只有树搜索过程
+
+
+### 4.3 AlphaZero
+推广精髓，老虎机来啦！
+> 让策略网络模仿到MCTS的探索效率（Exploit-Explore trade off）。
 
 
 # 到Muzero，对比学习
@@ -66,5 +76,8 @@
 6. 引用*所谓“基础好”，说白了是“能够把一切都很容易的变成自己的东西”；走到了这个良性循环之内，才能让人“学的越多、知道的越少”——知道的越少，那么把新东西纳入体系才更不费力。就好像你用“并行计算”轻易把map-reduce串进去一样。*
 7. ​两个状态之间的动作（动作也可以embedding抽象成文字描述)，​词向量空间就可以利用计算相似度，评估一些（什么东西）
 
-# 这些字的组织形式只是后来才理顺，打出来的，没啥用。重要的是之前过程中建立联系了的图。
+# 这些字的组织形式只是后来才理顺，打出来的，没啥用。重要的是之前过程中建立联系了的交换图、结构图、和待“若非”前的图的局部碎片。
 > ./sim_pics/1~10
+
+# TODO
+上述Muzero的实现是通过时序上的“1个动作诱导从一个状态到另一个状态的态射，把动作看做状态空间上的算子”。那么建立“从2个状态对诱导出一个动作”的生成网络，有什么本质的困难么？

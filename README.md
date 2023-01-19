@@ -1,4 +1,6 @@
 [TOC]
+> 实现了一个五子棋的训练 https://wandb.ai/opink/Muzero-15-15-5ziqi?workspace=user-opink
+
 
 # from_alphazero_back_to_bandits
  从实现alphazero开始，回溯到Exploit-Explor问题
